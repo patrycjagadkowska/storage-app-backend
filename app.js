@@ -22,6 +22,13 @@ app.use((req, res, next) => {
 
 app.use(authRouter);
 
+app.use((error, req, res, next) => {
+    const status = error.status || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(status).json({ message, data });
+});
+
 sequelize.sync().then(() => {
     app.listen(8080);
 }).catch((error) => {
