@@ -3,6 +3,9 @@ const bodyParser = require("body-parser");
 
 const sequelize = require("./database");
 
+const User = require("./models/User/User");
+const Contact = require("./models/User/Contact");
+
 const authRouter = require("./routes/auth");
 
 const app = express();
@@ -21,6 +24,9 @@ app.use((req, res, next) => {
 });
 
 app.use(authRouter);
+
+User.hasMany(Contact);
+Contact.belongsTo(User);
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;
