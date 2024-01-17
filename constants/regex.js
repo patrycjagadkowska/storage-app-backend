@@ -1,0 +1,1 @@
+exports.passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{5,20}$/;
