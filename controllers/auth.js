@@ -63,3 +63,22 @@ exports.postLogin = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getUserData = async (req, res, next) => {
+    const userId = req.userId;
+
+    try {
+        const existingUser = await User.findByPk(userId);
+
+        if (!existingUser) {
+            const error = new Error("Not authenticated!");
+            error.status = 401;
+            next(error);
+        }
+
+        const { email, userName } = existingUser;
+        res.status(200).json({ message: "User found", data: { email, userName }});
+    } catch (error) {
+        next(error);
+    }
+};
