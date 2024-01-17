@@ -35,7 +35,6 @@ exports.postLogin = async (req, res, next) => {
     const result = validationResult(req);
 
     if (!result.isEmpty()) {
-        console.log(result.array());
         const errorMsg = result.array()[0].msg;
 
         return res.status(422).json({ message: errorMsg });
@@ -78,6 +77,48 @@ exports.getUserData = async (req, res, next) => {
 
         const { email, userName } = existingUser;
         res.status(200).json({ message: "User found", data: { email, userName }});
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.postUserData = async (req, res, next) => {
+    const { userId } = req;
+    const { email, userName, oldPass, newPass } = req.body;
+
+    const result = validationResult(req);
+
+    if (!result.isEmpty()) {
+        const errorMsg = result.array()[0];
+
+        return res.status(422).json({ message: errorMsg });
+    }
+
+    try {
+        const existingUser = await User.findByPk(userId);
+        if (!existingUser) {
+            const error = new Error("Not authenticated.");
+            error.status = 401;
+            throw error;
+        }
+
+        const passIsValid = await bcrypt.compare(oldPass, existingUser.password);
+        if (!passIsValid) {
+            const error = new Error("Wrong password.");
+            error.status = 422;
+            throw error;
+        }
+
+        existingUser.email = email;
+        existingUser.userName = userName;
+        if (newPass && newPass.length !== 0) {
+            const hashedPassword = await bcrypt.hash(newPass, 12);
+            existingUser.password = hashedPassword;
+        }
+
+        await existingUser.save();
+
+        res.status(201).json({ message: "Data updated successfully." });
     } catch (error) {
         next(error);
     }
