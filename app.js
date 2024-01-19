@@ -7,6 +7,7 @@ const User = require("./models/User/User");
 const Contact = require("./models/User/Contact");
 
 const authRouter = require("./routes/auth");
+const contactsRouter = require("./routes/contacts");
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 });
 
 app.use(authRouter);
+app.use(contactsRouter);
 
 User.hasMany(Contact);
 Contact.belongsTo(User);
