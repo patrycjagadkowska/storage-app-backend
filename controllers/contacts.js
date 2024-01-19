@@ -17,8 +17,6 @@ exports.getContacts = async (req, res, next) => {
 
         const contacts = await Contact.findAll({ where: { UserId: userId }});
 
-        console.log(contacts);
-
         if (contacts === null){
             res.status(404).json({ message: "No data found."});
         }
