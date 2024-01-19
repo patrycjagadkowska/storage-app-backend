@@ -5,6 +5,8 @@ const sequelize = require("./database");
 
 const User = require("./models/User/User");
 const Contact = require("./models/User/Contact");
+const Category = require("./models/Item/Category");
+const Item = require("./models/Item/Item");
 
 const authRouter = require("./routes/auth");
 const contactsRouter = require("./routes/contacts");
@@ -29,6 +31,10 @@ app.use(contactsRouter);
 
 User.hasMany(Contact);
 Contact.belongsTo(User);
+User.hasMany(Category);
+Category.belongsTo(User);
+Category.hasMany(Item);
+Item.belongsTo(Category);
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;
