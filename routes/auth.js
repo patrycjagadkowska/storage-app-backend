@@ -11,10 +11,6 @@ const router = express.Router();
 const signUpValidation = [
     body("email").trim().notEmpty().isEmail(),
     body("password").trim().notEmpty()
-    .isStrongPassword({
-        minLowercase: 1,
-        minNumbers: 1
-    })
     .isLength({
         min: 5,
         max: 20
