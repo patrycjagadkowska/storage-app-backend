@@ -9,7 +9,7 @@ exports.postSignup = async (req, res, next) => {
     const result = validationResult(req);
 
     if (!result.isEmpty()) {
-        const errorMsg = result.array()[0].msg;
+        const errorMsg = result.array()[0];
 
         return res.status(422).json({ message: errorMsg });
     }
