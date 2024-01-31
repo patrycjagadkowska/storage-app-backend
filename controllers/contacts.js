@@ -46,8 +46,8 @@ exports.postAddContact = async (req, res, next) => {
         throw error;
       }
 
-      await Contact.create({ email, name, phone, address, UserId: userId });
-      res.status(201).json({ message: "Data was added successfully." });
+      const contact = await Contact.create({ email, name, phone, address, UserId: userId });
+      res.status(201).json({ message: "Data was added successfully.", contact });
     } catch (error) {
       next(error);
     }
