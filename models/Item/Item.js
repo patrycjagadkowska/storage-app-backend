@@ -10,7 +10,7 @@ const Item = sequelize.define("Item", {
         primaryKey: true,
     },
     name: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     quantity: {
