@@ -13,6 +13,10 @@ const Category = sequelize.define("Category", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    UserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
 });
 
 module.exports = Category;

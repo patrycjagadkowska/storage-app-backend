@@ -24,6 +24,10 @@ const Contact = sequelize.define("Contact", {
     email: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    UserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 });
 

@@ -18,6 +18,14 @@ const Item = sequelize.define("Item", {
         allowNull: false,
         defaultValue: 0,
     },
+    CategoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    UserId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
 });
 
 module.exports = Item;

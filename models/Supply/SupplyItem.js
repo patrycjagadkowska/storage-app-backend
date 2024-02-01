@@ -16,6 +16,14 @@ const SupplyItem = sequelize.define("SupplyItem", {
     purchasePrice: {
         type: DataTypes.DOUBLE,
         allowNull: false,
+    },
+    SupplyId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    ItemId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 });
 
