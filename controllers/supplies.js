@@ -131,7 +131,7 @@ exports.postEditSupply = async (req, res, next) => {
             }
 
             item.quantity += quantity;
-            await item. save();
+            await item.save();
 
             SupplyItem.create({
                 purchasePrice, 
@@ -141,7 +141,9 @@ exports.postEditSupply = async (req, res, next) => {
             });
         }
 
-        res.status(201).json({ message: "Data updated successfully"});
+        await supply.save();
+
+        res.status(201).json({ message: "Data updated successfully", supply});
     } catch (error) {
         next(error);
     }
