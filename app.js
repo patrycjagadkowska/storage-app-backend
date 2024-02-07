@@ -9,6 +9,8 @@ const Category = require("./models/Item/Category");
 const Item = require("./models/Item/Item");
 const Supply = require("./models/Supply/Supply");
 const SupplyItem = require("./models/Supply/SupplyItem");
+const Sale = require("./models/Sale/Sale");
+const SaleItem = require("./models/Sale/SaleItem");
 
 const authRouter = require("./routes/auth");
 const contactsRouter = require("./routes/contacts");
@@ -50,6 +52,13 @@ Supply.belongsTo(User);
 User.hasMany(Supply);
 Supply.hasOne(Contact);
 Contact.hasMany(Supply);
+Sale.belongsTo(User);
+User.hasMany(Sale);
+Sale.belongsToMany(Item, { through: SaleItem });
+Item.belongsToMany(Sale, { through: SaleItem });
+SaleItem.belongsTo(Sale);
+Sale.belongsTo(Contact);
+Contact.hasMany(Sale);
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;
