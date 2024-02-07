@@ -16,6 +16,7 @@ const authRouter = require("./routes/auth");
 const contactsRouter = require("./routes/contacts");
 const suppliesRouter = require("./routes/supplies");
 const stockRouter = require("./routes/stock");
+const salesRouter = require("./routes/sales");
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(authRouter);
 app.use(contactsRouter);
 app.use(suppliesRouter);
 app.use(stockRouter);
+app.use(salesRouter);
 
 User.hasMany(Contact);
 Contact.belongsTo(User);
