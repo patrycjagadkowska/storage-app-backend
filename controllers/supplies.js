@@ -56,6 +56,7 @@ exports.postAddSupply = async (req, res, next) => {
         });
 
         for (const itemData of items) {
+            //TODO add categoryName 
             const { itemName, purchasePrice, quantity } = itemData;
 
             const item = await Item.findOne({where: { name: itemName }});
