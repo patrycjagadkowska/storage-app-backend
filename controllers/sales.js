@@ -98,3 +98,45 @@ exports.postAddSale = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.postDeleteSale = async (req, res, next) => {
+    const { userId } = req;
+    const { saleId } = req.params;
+
+    try {
+        const verifiedUserId = await findExistingUser(userId);
+
+        const existingSale = await Sale.findByPk(saleId);
+
+        if (!existingSale) { 
+            const error = new Error("Sale not found.");
+            error.status = 404;
+            throw error;
+        }
+
+        if (existingSale.UserId !== verifiedUserId) {
+            const error = new Error("Unauthorized user.");
+            error.status = 403;
+            throw error;
+        }
+
+        if (existingSale.Items === 0) {
+            existingSale.destroy();
+        }
+
+        const saleItems = await SaleItem.findAll({ where: { SaleId: saleId }});
+
+        for (const saleItem of saleItems) {
+            const item = await Item.findByPk(saleItem.ItemId);
+            item.quantity += saleItem.quantity;
+            await item.save();
+            await saleItem.destroy();
+        }
+
+        await existingSale.destroy();
+
+        res.status(200).json({ message: "Sale deleted successfully." });
+    } catch (error) {
+        next(error);
+    }
+};
