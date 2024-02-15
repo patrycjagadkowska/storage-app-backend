@@ -140,3 +140,37 @@ exports.postDeleteSale = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.postEditSale = async (req, res, next) =>{
+    const { userId } = req;
+    const { saleId } = req.params;
+    const { date, customerId } = req.body;
+    
+    try {
+        const verifiedUserId = await findExistingUser(userId);
+        const verifiedCustomerId = await findExistingContact(customerId);
+
+        const existingSale = await Sale.findByPk(saleId);
+
+        if(!existingSale) {
+            const error = new Error("Sale not found");
+            error.status = 404;
+            throw error;
+        }
+
+        if (existingSale.UserId !== verifiedUserId) {
+            const error = new Error("Unauthorized user");
+            error.status = 403;
+            throw error;
+        }
+
+        existingSale.date = date;
+        existingSale.ContactId = verifiedCustomerId;
+
+        await existingSale.save();
+
+        res.status(201).json({ message: "Sale updated successfully.", data: existingSale });
+    } catch (error) {
+        next(error);
+    }
+};
