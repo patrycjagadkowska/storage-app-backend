@@ -257,3 +257,20 @@ exports.getItem = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getAllItems = async (req, res, next) => {
+    const { userId } = req;
+
+    try {
+        const verifiedUserId = await findExistingUser(userId);
+
+        const items = await Item.findAll({
+          where: { UserId: verifiedUserId },
+          attributes: ["id", "CategoryId", "name", "quantity"],
+        });
+
+        res.status(200).json({ message: "Data fetched successfully.", data: items });
+    } catch (error) {
+        next(error);
+    }
+};

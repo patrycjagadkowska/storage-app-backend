@@ -12,6 +12,7 @@ router.post("/addItem", isAuth, stockController.addItem);
 router.post("/editItem/:itemId", isAuth, stockController.editItem);
 router.post("/deleteItem/:itemId", isAuth, stockController.deleteItem);
 router.get("/categories", isAuth, stockController.getCategories);
+router.get("/categories/items", isAuth, stockController.getAllItems);
 router.get("/categories/:categoryId", isAuth, stockController.getCategoryItems);
 router.get("/categories/:categoryId/:itemId", isAuth, stockController.getItem);
 
