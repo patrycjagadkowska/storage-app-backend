@@ -195,7 +195,10 @@ exports.getCategories = async(req, res, next) => {
     try {
         const verifiedUserId = await findExistingUser(userId);
 
-        const categories = await Category.findAll({ where: { UserId: verifiedUserId }});
+        const categories = await Category.findAll({
+          where: { UserId: verifiedUserId },
+          attributes: ["id", "name"],
+        });
 
         res.status(200).json({ message: "Data fetched successfully", data: categories });
     } catch (error) {
