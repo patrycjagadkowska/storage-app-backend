@@ -15,5 +15,6 @@ router.get("/categories", isAuth, stockController.getCategories);
 router.get("/categories/items", isAuth, stockController.getAllItems);
 router.get("/categories/:categoryId", isAuth, stockController.getCategoryItems);
 router.get("/categories/:categoryId/:itemId", isAuth, stockController.getItem);
+router.post("/addInventory", isAuth, stockController.addInventory);
 
 module.exports = router;

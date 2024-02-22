@@ -1,6 +1,8 @@
 const { findExistingUser } = require("../constants/functions");
 const Category = require("../models/Item/Category");
 const Item = require("../models/Item/Item");
+const Inventory = require("../models/Inventory/Inventory");
+const InventoryItem = require("../models/Inventory/InventoryItem");
 
 exports.addCategory = async (req, res, next) => {
     const { userId } = req;
@@ -273,6 +275,73 @@ exports.getAllItems = async (req, res, next) => {
         });
 
         res.status(200).json({ message: "Data fetched successfully.", data: items });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.addInventory = async (req, res, next) => {
+    const { userId } = req;
+    const { formValues } = req.body;
+
+    console.log(formValues);
+
+    try {
+        const verifiedUserId = await findExistingUser(userId);
+
+        const inventory = await Inventory.create({ UserId: verifiedUserId });
+
+        for (const category in formValues) {
+            
+            const existingCategory = await Category.findByPk(category);
+
+            if (!existingCategory) {
+                const error = new Error("No category found.");
+                error.status = 404;
+                throw error;
+            }
+
+            if (existingCategory.UserId !== verifiedUserId) {
+                const error = new Error("Unauthorized user.");
+                error.status = 403;
+                throw error;
+            }
+
+            const items = formValues[category];
+
+            for (const item of items) {
+                const existingItem = await Item.findByPk(item.id);
+
+                if (!existingItem) {
+                    const error = new Error("No item found.");
+                    error.status = 404;
+                    throw error;
+                }
+
+                if (existingItem.UserId !== verifiedUserId) {
+                    const error = new Error("Unauthorized user.");
+                    error.status = 403;
+                    throw error;
+                }
+
+                if (existingItem.CategoryId !== existingCategory.id) {
+                    const error = new Error("Wrong category/item id.");
+                    error.status = 422;
+                    throw error;
+                }
+
+                await InventoryItem.create({
+                    InventoryId: inventory.id,
+                    ItemId: existingItem.id,
+                    quantityBefore: existingItem.quantity,
+                    quantityAfter: item.quantity
+                });
+
+                existingItem.quantity = item.quantity;
+                await existingItem.save();
+            }
+        }
+        res.status(201).json({ message: "Inventory added successfully", data: inventory });
     } catch (error) {
         next(error);
     }
