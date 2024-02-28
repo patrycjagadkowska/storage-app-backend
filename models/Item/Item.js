@@ -18,6 +18,11 @@ const Item = sequelize.define("Item", {
         allowNull: false,
         defaultValue: 0,
     },
+    salePrice: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+        defaultValue: 0.00
+    },
     CategoryId: {
         type: DataTypes.INTEGER,
         allowNull: false,

@@ -129,8 +129,9 @@ exports.addItem = async (req, res, next) => {
 };
 
 exports.editItem = async (req, res, next) => {
+    console.log("I work");
     const { userId } = req;
-    const { name, categoryId } = req.body;
+    const { name, categoryId, salePrice, quantity } = req.body;
     const { itemId } = req.params;
 
     try {
@@ -153,6 +154,7 @@ exports.editItem = async (req, res, next) => {
 
     item.CategoryId = categoryId;
     item.name = name;
+    item.salePrice = salePrice;
 
     await item.save();
 
@@ -271,7 +273,7 @@ exports.getAllItems = async (req, res, next) => {
 
         const items = await Item.findAll({
           where: { UserId: verifiedUserId },
-          attributes: ["id", "CategoryId", "name", "quantity"],
+          attributes: ["id", "CategoryId", "name", "quantity", "salePrice"],
         });
 
         res.status(200).json({ message: "Data fetched successfully.", data: items });
