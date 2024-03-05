@@ -129,7 +129,6 @@ exports.addItem = async (req, res, next) => {
 };
 
 exports.editItem = async (req, res, next) => {
-    console.log("I work");
     const { userId } = req;
     const { name, categoryId, salePrice, quantity } = req.body;
     const { itemId } = req.params;
@@ -155,10 +154,11 @@ exports.editItem = async (req, res, next) => {
     item.CategoryId = categoryId;
     item.name = name;
     item.salePrice = salePrice;
+    item.quantity = quantity;
 
     await item.save();
 
-    res.status(201).json({ message: "Data updated successfully" });
+    res.status(201).json({ message: "Data updated successfully", data: item });
     } catch (error) {
         next(error);
     }
