@@ -150,7 +150,9 @@ exports.postEditSale = async (req, res, next) =>{
         const verifiedUserId = await findExistingUser(userId);
         const verifiedCustomerId = await findExistingContact(customerId);
 
-        const existingSale = await Sale.findByPk(saleId);
+        const existingSale = await Sale.findByPk(saleId, {
+            include: Item
+        });
 
         if(!existingSale) {
             const error = new Error("Sale not found");
