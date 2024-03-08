@@ -27,5 +27,6 @@ const contactValidation = [
 
 router.get("/contacts", isAuth, contactsController.getContacts);
 router.post("/addContact", isAuth, contactValidation, contactsController.postAddContact);
+router.post("/deleteContact/:contactId", isAuth, contactsController.postDeleteContact);
 
 module.exports = router;
