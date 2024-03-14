@@ -81,3 +81,44 @@ exports.postDeleteContact = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.postEditContact = async (req, res, next) => {
+    const { userId } = req;
+    const { contactId } = req.params;
+    const { name, email, phone, address } = req.body;
+
+    const result = validationResult(req);
+    if (!result.isEmpty()) {
+        const errorMsg = result.array()[0];
+
+        return res.status(422).json({ message: errorMsg });
+    }
+
+    try {
+        const existingUser = await findExistingUser(userId);
+
+        const existingContact = await Contact.findByPk(contactId);
+
+        if (!existingContact) {
+            const error = new Error("Contact not found.");
+            error.status = 404;
+            throw error;
+        }
+        if (existingContact.UserId !== existingUser) {
+            const error = new Error("Unauthorized user.");
+            error.status = 403;
+            throw error;
+        }
+
+        existingContact.name = name;
+        existingContact.phone = phone;
+        existingContact.address = address;
+        existingContact.email = email;
+
+        await existingContact.save();
+
+        res.status(201).json({ message: "Data updated successfully.", data: existingContact });
+    } catch (error) {
+        console.log(error);
+    }
+}
