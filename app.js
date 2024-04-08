@@ -19,6 +19,7 @@ const contactsRouter = require("./routes/contacts");
 const suppliesRouter = require("./routes/supplies");
 const stockRouter = require("./routes/stock");
 const salesRouter = require("./routes/sales");
+const statsRouter = require("./routes/stats");
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(contactsRouter);
 app.use(suppliesRouter);
 app.use(stockRouter);
 app.use(salesRouter);
+app.use(statsRouter);
 
 User.hasMany(Contact);
 Contact.belongsTo(User);
