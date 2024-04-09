@@ -35,7 +35,10 @@ exports.getMonthlyIncome = async (req, res, next) => {
             attributes: ["id"]
         }], attributes: ["id", "date", "ContactId", "UserId"]});
 
-        // console.log(allSales);
+        const allItems = await Item.findAll({ where: {
+            UserId: verifiedUserId
+        }, attributes: ["salePrice", "quantity"]});
+
         const totalSales = allSales.reduce((total, sale) => {
             const totalOneSale = sale.Items.reduce((totalItems, item) => {
                 const totalOneItem = item.SaleItem.price * item.SaleItem.quantity;
@@ -52,8 +55,11 @@ exports.getMonthlyIncome = async (req, res, next) => {
             return total + totalOneSupply;
         }, 0);
 
+        const warehouseValue = allItems.reduce((total, item) => {
+            return total + item.salePrice * item.quantity;
+        }, 0);
       
-        res.status(200).json({ data: {totalSales, totalExpenses} });
+        res.status(200).json({ data: {totalSales, totalExpenses, warehouseValue} });
     } catch (error) {
         next(error);
     }
