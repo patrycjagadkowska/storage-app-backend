@@ -58,8 +58,10 @@ exports.getMonthlyIncome = async (req, res, next) => {
         const warehouseValue = allItems.reduce((total, item) => {
             return total + item.salePrice * item.quantity;
         }, 0);
+
+        const profitMargin = totalSales - totalExpenses;
       
-        res.status(200).json({ data: {totalSales, totalExpenses, warehouseValue} });
+        res.status(200).json({ data: {totalSales, totalExpenses, warehouseValue, profitMargin} });
     } catch (error) {
         next(error);
     }
