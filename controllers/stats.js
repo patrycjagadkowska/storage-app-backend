@@ -13,47 +13,26 @@ exports.getMonthlyIncome = async (req, res, next) => {
     try {
         const verifiedUserId = await findExistingUser(userId);
 
-        const firstDayOfMonth = new Date(year, month - 1, 1);
-        const lastDayOfMonth = new Date(year, month, 0);
-        const allSales = await Sale.findAll({ where: { UserId: verifiedUserId, date: {
-            [Sequelize.Op.between]: [firstDayOfMonth, lastDayOfMonth]
-        }}, include: [{
-            model: Item,
-            through: {
-                attributes: ["id", "price", "quantity"]
-            },
-            attributes: ["id"]
-        }], attributes: ["id", "date", "UserId", "ContactId"]});
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
 
-        const allSupplies = await Supply.findAll({ where: { UserId: verifiedUserId, date: {
-            [Sequelize.Op.between]: [firstDayOfMonth, lastDayOfMonth]
-        }}, include: [{
-            model: Item,
-            throught: {
-                attributes: ["id", "purchasePrice", "quantity"]
-            },
-            attributes: ["id"]
-        }], attributes: ["id", "date", "ContactId", "UserId"]});
+        const totalSales = await Sale.sum("total", {where: {
+            UserId: verifiedUserId,
+            date: {
+                [Sequelize.Op.between]: [firstDayOfMonth, lastDayOfMonth]
+            }
+        }});
+
+        const totalExpenses = await Supply.sum("total", {where:{
+            UserId: verifiedUserId,
+            date: {
+                [Sequelize.Op.between]: [firstDayOfMonth, lastDayOfMonth]
+            }
+        }});
 
         const allItems = await Item.findAll({ where: {
             UserId: verifiedUserId
         }, attributes: ["salePrice", "quantity"]});
-
-        const totalSales = allSales.reduce((total, sale) => {
-            const totalOneSale = sale.Items.reduce((totalItems, item) => {
-                const totalOneItem = item.SaleItem.price * item.SaleItem.quantity;
-                return totalItems + totalOneItem;
-            }, 0);
-            return total + totalOneSale;
-        }, 0);
-
-        const totalExpenses = allSupplies.reduce((total, supply) => {
-            const totalOneSupply = supply.Items.reduce((totalItems, item) => {
-                const totalOneItem = item.SupplyItem.purchasePrice * item.SupplyItem.quantity;
-                return totalItems + totalOneItem;
-            }, 0);
-            return total + totalOneSupply;
-        }, 0);
 
         const warehouseValue = allItems.reduce((total, item) => {
             return total + item.salePrice * item.quantity;
