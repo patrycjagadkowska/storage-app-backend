@@ -13,6 +13,11 @@ const Supply = sequelize.define("Supply", {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
+    total: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+        defaultValue: 0
+    },
     UserId: {
         type: DataTypes.INTEGER,
         allowNull: false

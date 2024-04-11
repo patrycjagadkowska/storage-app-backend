@@ -55,6 +55,8 @@ exports.postAddSupply = async (req, res, next) => {
           UserId: verifiedUserId,
         });
 
+        let total = 0;
+
         for (const itemData of items) {
             //TODO add categoryName 
             const { itemName, purchasePrice, quantity } = itemData;
@@ -76,7 +78,12 @@ exports.postAddSupply = async (req, res, next) => {
                 ItemId: item.id,
                 SupplyId: supply.id,
             });
+
+            total += quantity * purchasePrice;
         }
+
+        supply.total = total;
+        await supply.save();
         
         res.status(201).json({ message: "Data added successfully" });
     } catch (error) {

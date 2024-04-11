@@ -13,6 +13,11 @@ const Sale = sequelize.define("Sale", {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
+    total: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+        defaultValue: 0
+    },
     ContactId: {
         type: DataTypes.INTEGER,
         allowNull: false

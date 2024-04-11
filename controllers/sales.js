@@ -59,6 +59,8 @@ exports.postAddSale = async (req, res, next) => {
           UserId: verifiedUserId,
         });
 
+        let total = 0;
+
         for (const itemData of items) {
             const { itemName, categoryName, price, quantity } = itemData;
 
@@ -91,8 +93,13 @@ exports.postAddSale = async (req, res, next) => {
               SaleId: sale.id,
               ItemId: item.id,
             });
+
+            total += price * quantity;
         }
 
+        sale.total = total;
+        await sale.save(); 
+        
         res.status(201).json({ message: "Data added successfully." });
     } catch (error) {
         next(error);
