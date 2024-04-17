@@ -5,6 +5,8 @@ const Supply = require("../models/Supply/Supply");
 const { months } = require("../constants/dates");
 const { findExistingUser } = require("../constants/functions");
 const Item = require("../models/Item/Item");
+const SaleItem = require("../models/Sale/SaleItem");
+const Category = require("../models/Item/Category");
 
 exports.getMonthlyIncome = async (req, res, next) => {
     const { userId } = req;
@@ -129,6 +131,72 @@ exports.getLastSixMonths = async (req, res, next) => {
         });
 
         res.status(200).json({ message: "Data fetched successfully", data: mappedData });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getLastMonth = async (req, res, next) => {
+    const { userId } = req;
+    const { year, month } = req.query;
+
+    try {
+        const verifiedUserId = await findExistingUser(userId);
+
+        const sales = await Sale.findAll({
+          where: {
+            UserId: verifiedUserId,
+            date: {
+              [Sequelize.Op.between]: [
+                new Date(year, month, 1),
+                new Date(year, month + 1, 0),
+              ],
+            },
+          },
+          attributes: ["id"],
+          include: [
+            {
+              model: Item,
+              attributes: ["id"],
+              include: [
+                {
+                  model: Category,
+                  attributes: ["id", "name"]
+                },
+              ],
+              through: [{
+                model: SaleItem,
+                attributes: ["id", "quantity", "price"]
+              }]
+            },
+          ],
+        });
+
+        const categories = await Category.findAll({ where: {
+            UserId: verifiedUserId
+        }});
+
+        const data = categories.map((category) => {
+            return {
+                id: category.id,
+                name: category.name,
+                value: 0
+            }
+        });
+
+        sales.forEach((sale) => {
+            const items = sale.Items;
+            items.forEach((item) => {
+                const value = item.SaleItem.price * item.SaleItem.quantity;
+                const categoryId = item.Category.id;
+                const categoryIndex = data.findIndex((category) => category.id === categoryId);
+                const categoryNewData = {...data[categoryIndex]};
+                categoryNewData.value += value;
+                data.splice(categoryIndex, 1, categoryNewData);
+            });
+        });
+
+        res.status(200).json({ message: "Data fetched successfully", data });
     } catch (error) {
         next(error);
     }
