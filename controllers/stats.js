@@ -51,7 +51,6 @@ exports.getMonthlyIncome = async (req, res, next) => {
 exports.getLastSixMonths = async (req, res, next) => {
     const { userId } = req;
     const { year, month } = req.query;
-    console.log(month);
 
     try {
         const verifiedUserId = await findExistingUser(userId);
