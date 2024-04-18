@@ -201,3 +201,110 @@ exports.getLastMonth = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getItemsSummary = async (req, res, next) => {
+  const { userId } = req;
+  const { year, month } = req.query;
+
+  try {
+    const verifiedUserId = await findExistingUser(userId);
+
+    const lowQuantityItems = await Item.findAll({
+      where: {
+        UserId: verifiedUserId,
+        quantity: { [Sequelize.Op.lt]: 15 },
+      },
+      include: {
+        model: Category,
+        attributes: ["id", "name"],
+      },
+      attributes: ["id", "name", "quantity"],
+    });
+
+    const lastYearSales = await Sale.findAll({
+      where: {
+        UserId: verifiedUserId,
+        date: {
+          [Sequelize.Op.between]: [
+            new Date(year - 1, month, 1),
+            new Date(year, month + 1, 0),
+          ],
+        },
+      },
+      attributes: ["id"],
+    });
+
+    const salesIds = lastYearSales.map((sale) => sale.id);
+
+    const saleItems = await SaleItem.findAll({
+      where: {
+        SaleId: {
+          [Sequelize.Op.in]: salesIds,
+        },
+      },
+      attributes: ["quantity", "ItemId", "id"],
+    });
+
+    const itemsTotalQuantities = [];
+
+    for (const item of saleItems) {
+      let found = false;
+      for (let i = 0; i < itemsTotalQuantities.length; i++) {
+        if (itemsTotalQuantities[i].id === item.ItemId) {
+          itemsTotalQuantities[i].quantity += parseInt(item.quantity);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        itemsTotalQuantities.push({
+          id: item.ItemId,
+          quantity: parseInt(item.quantity),
+        });
+      }
+    }
+
+    itemsTotalQuantities.sort((a, b) => b.quantity - a.quantity);
+
+    const bestsellers =
+      itemsTotalQuantities.length > 5
+        ? itemsTotalQuantities.slice(0, 5)
+        : itemsTotalQuantities;
+
+    const itemsIds = bestsellers.map((best) => best.id);
+
+    const items = await Item.findAll({where: {
+        id: {
+            [Sequelize.Op.in]: itemsIds
+        },
+    }});
+
+    const categoriesIds = items.map((item) => item.CategoryId);
+
+    const categories = await Category.findAll({ where: {
+        id: {
+            [Sequelize.Op.in]: categoriesIds 
+        },
+    }, attributes: ["id", "name"]
+    });
+
+    const bestsellersWithNames = bestsellers.map((best) => {
+        const item = items.find((item) => item.id === best.id);
+        const categoryName = categories.find((cat) => cat.id === item.CategoryId).name;
+        return {
+            ...best, 
+            categoryName,
+            itemName: item.name
+        };
+    });
+
+    res
+      .status(200)
+      .json({
+        message: "Data fetched successfully",
+        data: { lowQuantityItems, saleItems, bestsellersWithNames },
+      });
+  } catch (error) {
+    next(error);
+  }
+};
