@@ -301,7 +301,7 @@ exports.getItemsSummary = async (req, res, next) => {
       .status(200)
       .json({
         message: "Data fetched successfully",
-        data: { lowQuantityItems, saleItems, bestsellersWithNames },
+        data: { lowQuantityItems, bestsellers: bestsellersWithNames },
       });
   } catch (error) {
     next(error);
