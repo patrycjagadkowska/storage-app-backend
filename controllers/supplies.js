@@ -143,6 +143,16 @@ exports.postEditSupply = async (req, res, next) => {
             
             const item = await Item.findByPk(itemId);
             if (!item) {
+                const alreadyCreatedItems = await SupplyItem.findAll({
+                    where: { SupplyId: supply.id },
+                  });
+  
+                  for (const supplyItem in alreadyCreatedItems) {
+                      const item = await Item.findByPk(supply.ItemId);
+                      item.quantity -= supplyItem.quantity;
+                      await item.save();
+                      await supplyItem.destroy();
+                  }
                 const error = new Error("Data not found");
                 error.status = 404;
                 throw error;
