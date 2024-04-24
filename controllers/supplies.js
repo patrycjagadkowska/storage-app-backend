@@ -69,11 +69,11 @@ exports.postAddSupply = async (req, res, next) => {
                 for (const supplyItem in alreadyCreatedItems) {
                     const item = await Item.findByPk(supply.ItemId);
                     item.quantity -= supplyItem.quantity;
-                    item.save();
-                    supplyItem.destroy();
+                    await item.save();
+                    await supplyItem.destroy();
                 }
-                
-                supply.destroy();
+
+                await supply.destroy();
                 const error = new Error("Item not found");
                 error.status = 404;
                 throw error;
