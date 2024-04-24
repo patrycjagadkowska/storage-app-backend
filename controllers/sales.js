@@ -142,14 +142,14 @@ exports.postDeleteSale = async (req, res, next) => {
         }
 
         if (existingSale.Items === 0) {
-            existingSale.destroy();
+            await existingSale.destroy();
         }
 
         const saleItems = await SaleItem.findAll({ where: { SaleId: saleId }});
 
         for (const saleItem of saleItems) {
             const item = await Item.findByPk(saleItem.ItemId);
-            item.quantity += saleItem.quantity;
+            item.quantity -= saleItem.quantity;
             await item.save();
             await saleItem.destroy();
         }
