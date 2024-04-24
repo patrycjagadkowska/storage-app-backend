@@ -67,7 +67,14 @@ exports.postAddSale = async (req, res, next) => {
             const itemCategory = await Category.findOne({ where: { name: categoryName }});
 
             if (!itemCategory) {
-                sale.destroy();
+                const alreadycreatedItems = await SaleItem.findAll({ where: { SaleId: sale.id }});
+                for ( const saleItem of alreadycreatedItems) {
+                    const item = await Item.findByPk(saleItem.ItemId);
+                    item.quantity -= saleItem.quantity;
+                    await item.save();
+                    await saleItem.destroy();
+                }
+                await sale.destroy();
                 const error = new Error("Data not found.");
                 error.status = 404;
                 throw error;
@@ -78,14 +85,21 @@ exports.postAddSale = async (req, res, next) => {
             });
 
             if (!item) {
-                sale.destroy();
+                const alreadycreatedItems = await SaleItem.findAll({ where: { SaleId: sale.id }});
+                for ( const saleItem of alreadycreatedItems) {
+                    const item = await Item.findByPk(saleItem.ItemId);
+                    item.quantity -= saleItem.quantity;
+                    await item.save();
+                    await saleItem.destroy();
+                }
+                await sale.destroy();
                 const error = new Error("No data found.");
                 error.status = 404;
                 throw error;
             }
 
             item.quantity -= quantity;
-            item.save();
+            await item.save();
 
             await SaleItem.create({
               price,
