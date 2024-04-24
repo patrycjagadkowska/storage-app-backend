@@ -58,11 +58,21 @@ exports.postAddSupply = async (req, res, next) => {
         let total = 0;
 
         for (const itemData of items) {
-            //TODO add categoryName 
             const { itemName, purchasePrice, quantity } = itemData;
 
             const item = await Item.findOne({where: { name: itemName }});
             if (!item) {
+                const alreadyCreatedItems = await SupplyItem.findAll({
+                  where: { SupplyId: supply.id },
+                });
+
+                for (const supplyItem in alreadyCreatedItems) {
+                    const item = await Item.findByPk(supply.ItemId);
+                    item.quantity -= supplyItem.quantity;
+                    item.save();
+                    supplyItem.destroy();
+                }
+                
                 supply.destroy();
                 const error = new Error("Item not found");
                 error.status = 404;
