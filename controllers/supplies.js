@@ -66,7 +66,7 @@ exports.postAddSupply = async (req, res, next) => {
                   where: { SupplyId: supply.id },
                 });
 
-                for (const supplyItem in alreadyCreatedItems) {
+                for (const supplyItem of alreadyCreatedItems) {
                     const item = await Item.findByPk(supply.ItemId);
                     item.quantity -= supplyItem.quantity;
                     await item.save();
@@ -147,7 +147,7 @@ exports.postEditSupply = async (req, res, next) => {
                     where: { SupplyId: supply.id },
                   });
   
-                  for (const supplyItem in alreadyCreatedItems) {
+                  for (const supplyItem of alreadyCreatedItems) {
                       const item = await Item.findByPk(supply.ItemId);
                       item.quantity -= supplyItem.quantity;
                       await item.save();
