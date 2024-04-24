@@ -57,7 +57,16 @@ exports.postLogin = async (req, res, next) => {
 
         const userId = existingUser.id;
         const token = jwt.sign({ userId }, "supersecretkey", { expiresIn: "12h" });
-        res.status(200).json({ message: "Successfully logged in.", userId, token });
+        const expirationTime = new Date();
+        expirationTime.setHours(expirationTime.getHours() + 12);
+        res
+          .status(200)
+          .json({
+            message: "Successfully logged in.",
+            userId,
+            token,
+            expiresIn: expirationTime,
+          });
     } catch (error) {
         next(error);
     }
