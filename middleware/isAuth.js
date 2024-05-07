@@ -6,7 +6,7 @@ const isAuth = (req, res, next) => {
     if (!authHeader) {
         const error = new Error("Not authenticated!");
         error.status = 401;
-        next(error);
+        throw error;
     }
 
     const token = authHeader.split(" ")[1];
@@ -17,10 +17,9 @@ const isAuth = (req, res, next) => {
     } catch (error) {
         if (!error.status) {
             error.status = 401;
-            next(error);
+            throw error;
         }
     }
-
     req.userId = decodedToken.userId;
     next();
 };
