@@ -23,10 +23,12 @@ exports.postSignup = async (req, res, next) => {
         }
 
         const encryptedPass = await bcrypt.hash(password, 12);
-        await User.create({ email, password: encryptedPass });
-        res.status(201).json({ message: "User registered successfully." });
+        const user = await User.create({ email, password: encryptedPass });
+        res.status(201).json({ message: "User registered successfully.", userId: user.id });
+        return res;
     } catch (error) {
         next(error);
+        return error;
     }
 };
 
@@ -67,8 +69,10 @@ exports.postLogin = async (req, res, next) => {
             token,
             expiresIn: expirationTime,
           });
+          return res;
     } catch (error) {
         next(error);
+        return error;
     }
 };
 
@@ -81,13 +85,15 @@ exports.getUserData = async (req, res, next) => {
         if (!existingUser) {
             const error = new Error("Not authenticated!");
             error.status = 401;
-            next(error);
+            throw error;
         }
 
         const { email, userName } = existingUser;
         res.status(200).json({ message: "User found", data: { email, userName }});
+        return res;
     } catch (error) {
         next(error);
+        return error;
     }
 };
 
